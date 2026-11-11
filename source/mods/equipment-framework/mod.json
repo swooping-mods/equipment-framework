@@ -1,0 +1,20 @@
+{
+  "id": "equipment-framework",
+  "kind": "native",
+  "version": "0.1.0",
+  "display_name": "Equipment Framework",
+  "feature_dependencies": [],
+  "gameplay": true,
+  "play_help": [
+    "Purchased modded tools appear in the normal equipment inventory. Assign them to a normal quickslot; switch tools with the game's usual controls."
+  ],
+  "provides": {
+    "equipment-framework.equipment": {
+      "abi": 1,
+      "size": 32,
+      "limits": {
+        "max_items": 32
+      }
+    }
+  }
+}

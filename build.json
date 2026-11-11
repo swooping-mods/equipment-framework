@@ -1,0 +1,6 @@
+{
+  "schema": "moon-independent-build-spec/v1",
+  "id": "equipment-framework",
+  "kind": "native",
+  "entry": "mods/equipment-framework/mod.c"
+}
