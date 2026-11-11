@@ -1,5 +1,7 @@
 # Equipment Framework
 
+<img src="media/icon.png" alt="Equipment Framework icon" width="128" height="128">
+
 Register modded tools in the normal inventory and handheld quickslots.
 
 ## Install
