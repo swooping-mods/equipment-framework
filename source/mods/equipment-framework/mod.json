@@ -9,6 +9,10 @@
     "Purchased modded tools appear in the normal equipment inventory. Assign them to a normal quickslot; switch tools with the game's usual controls."
   ],
   "provides": {
+    "equipment-framework.menu-cleanup": {
+      "abi": 1,
+      "size": 16
+    },
     "equipment-framework.equipment": {
       "abi": 1,
       "size": 32,

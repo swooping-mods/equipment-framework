@@ -1,6 +1,17 @@
 # Equipment Framework: behavior and implementation
 
-Describes the exported implementation **0.1.0**. The linked source and metadata define this version; gameplay qualification is a separate requirement.
+Describes the retained payload **0.1.0**. The behavior prose describes the retained payload; current candidate source and metadata are identified below. Gameplay qualification is a separate requirement.
+
+
+<!-- source-only-sync -->
+## Current source candidate
+
+Source version **0.1.0** is saved from workshop revision `ca32bbf79ce0840d5166a232bdb3a9fdcd761254`. The retained installable payload remains **0.1.0** with its original bytes. This source update does not rebuild or requalify that payload. The current source and metadata define the candidate; gameplay, rendered behavior and co-op remain unqualified for rebuilt bytes.
+
+The authored behavior and lifecycle descriptions below are retained from the published payload. They are not new qualification evidence for the source candidate. The integration table below follows the current candidate metadata.
+
+The exported test sources have deferred generated harness includes; their fixture closure is incomplete and they are not qualified executable tests. See `provenance.json` for the exact missing include identities.
+<!-- /source-only-sync -->
 
 ## Behavior
 
@@ -18,6 +29,7 @@ The [module metadata](../source/mods/equipment-framework/mod.json) owns the vers
 
 | Service | ABI | Table size |
 |---|---:|---|
+| Provides `equipment-framework.menu-cleanup` | 1 | 16 bytes |
 | Provides `equipment-framework.equipment` | 1 | 32 bytes |
 
 ## Implementation sources

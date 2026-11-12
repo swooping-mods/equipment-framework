@@ -11,6 +11,7 @@ static void (*me_set)(PTR,PTR,void *),(*me_barrier)(PTR,PTR *,PTR);
 static const unsigned short *(*me_chars)(PTR);static int (*me_length)(PTR);
 static DRoot me_world,me_catalog,me_original_catalog,me_walker,me_brush;
 static DWORD me_thread,me_owned_bits;static int me_started,me_busy,me_failed,me_owned_busy,me_brush_prior,me_brush_override;
+#include "menu_cleanup.h"
 static void me_event(const char *name){if(!me_log)return;char b[256],*p=cat(b,"{\"event\":\"");p=cat(p,name);p=cat(p,"\"}\n");DWORD n=0;WriteFile(me_log,b,(DWORD)(p-b),&n,0);FlushFileBuffers(me_log);}
 static PTR me_field(PTR obj,const char *name){PTR out=0;PTR f=obj?get_field(object_class(obj),name):0;if(f)field_value(obj,f,&out);return out;}
 static int me_reference(PTR obj,const char *name,PTR value){
@@ -146,7 +147,7 @@ static int me_custom_brush(PTR brush){
 static int me_before(int id,Context *c){
     if(me_failed)return 0;
     if(!me_thread)me_thread=GetCurrentThreadId();if(GetCurrentThreadId()!=me_thread)return 0;
-    if(id==7){me_collect_world();return 0;}
+    if(id==7){me_dispatch_menu_cleanup();me_collect_world();return 0;}
     if(id==6)return me_custom_brush((PTR)c->rcx);
     if(id==0){
         PTR world=me_field((PTR)c->rcx,"world");if(!world){if(me_world)me_drop_world();return 0;}
@@ -191,8 +192,10 @@ static int me_before(int id,Context *c){
 }
 static const MoonEquipment me_api={ME_ABI,sizeof(MoonEquipment),me_register,me_equipped,me_equip};
 __declspec(dllexport) const MoonEquipment *MoonLab_Equipment_v1(unsigned int abi,unsigned int size){return me_started&&abi==ME_ABI&&size==sizeof(MoonEquipment)?&me_api:0;}
+__declspec(dllexport) const MoonEquipmentMenuCleanupV1 *MoonLab_EquipmentMenuCleanup_v1(unsigned abi,unsigned size){return me_started&&abi==ME_CLEANUP_ABI&&size==sizeof(me_cleanup_api)?&me_cleanup_api:0;}
 __declspec(dllexport) int MoonLab_ModStart(PTR domain,PTR game){
     if(me_started)return 1;char folder[1000],path[1200];DWORD n=GetEnvironmentVariableA("MOONLAB_EVIDENCE",folder,1000);if(!n||n>=1000)return 0;
+    __atomic_store_n(&me_cleanup_startup_thread,GetCurrentThreadId(),__ATOMIC_RELEASE);
     cat(cat(path,folder),"\\equipment-framework.jsonl");me_log=CreateFileA(path,0x40000000,1,0,1,0x80,0);if(me_log==(PTR)(U64)-1)return 0;
     if(!bind_runtime(domain,game)||!dapi(game))return 0;
 #define ME_BIND(F,N,T) F=(T)GetProcAddress(game,"il2cpp_" N);if(!F)return 0
@@ -222,6 +225,8 @@ __declspec(dllexport) int MoonLab_ModStart(PTR domain,PTR game){
         const MoonServiceLimitV1 limits[]={{"max_items",ME_LIMIT}};
         MoonServicePublicationLimitsV1 publication={.base={.size=sizeof(publication),.service_id="equipment",.abi=ME_ABI,.api_size=sizeof(me_api),.api=&me_api},.limit_count=sizeof(limits)/sizeof(limits[0]),.reserved=0,.limits=limits};
         if(!runtime||!runtime->publish(&publication.base))return 0;
+        MoonServicePublicationV1 cleanup={.size=sizeof(cleanup),.service_id="menu-cleanup",.abi=ME_CLEANUP_ABI,.api_size=sizeof(me_cleanup_api),.api=&me_cleanup_api};
+        if(!runtime->publish(&cleanup))return 0;
     }
     me_started=1;me_event("ready");return 1;
 }
